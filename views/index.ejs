@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Schedule for Pick-Up View</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .sidebar {
+            height: 100vh;
+            width: 250px;
+            position: fixed;
+            background-color: #00180a;
+            padding-top: 20px;
+            color: #ecf0f1;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+            font-weight: normal;
+            color: #a8e6cf;
+            margin-bottom: 20px;
+        }
+
+        .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .sidebar ul li a {
+            color: #ddd;
+            text-decoration: none;
+            display: block;
+            font-size: 18px;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+        /* Header */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 250px;
+            width: calc(100% - 290px);
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            background-color: #00180a;
+            color: #fff;
+            z-index: 1000;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .navbar-left img {
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+            border-radius: 50%;
+        }
+
+        /* Admin Profile */
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            font-size: 15px;
+            position: relative;
+        }
+
+        .admin-profile i {
+            margin-right: 10px;
+            padding-left: 8px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: #fff;
+            color: #333;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        .dropdown-menu a {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+
+        .dropdown-menu a.logout {
+            color: white;
+            background-color: #333;
+        }
+
+        .main-content {
+            margin-left: 250px;
+            padding: 80px 20px;
+        }
+
+        .schedule-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .schedule-table th,
+        .schedule-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        .schedule-table th {
+            background-color: #f2f2f2;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            /* Hidden by default */
+            position: fixed;
+            z-index: 1;
+            /* Sit on top */
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+            padding-top: 60px;
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 5% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+        }
+
+        .modal-close {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .modal input,
+        .modal select {
+            width: 95%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .modal button {
+            width: 100%;
+            padding: 10px;
+            background-color: #00180a;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal button:hover {
+            background-color: #495057;
+        }
+
+        .add-button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .add-button:hover {
+            background-color: #45a049;
+            transform: translateY(-3px);
+        }
+
+        .edit-button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .edit-button:hover {
+            background-color: #f57c00;
+            transform: translateY(-3px);
+        }
+
+        .delete-button {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            font-size: 14px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .delete-button:hover {
+            background-color: #d32f2f;
+            transform: translateY(-3px);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <h2><i class="fas fa-user-circle"></i> Admin</h2>
+        <ul>
+            <li>
+                <a href="#" onclick="toggleSubMenu()">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <span id="caret" class="bi bi-caret-down-fill" style="float: right;"></span>
+                </a>
+                <ul class="sub-menu" id="dashboardSubMenu">
+                    <li><a href=""><i class="fas fa-user"></i> Users</a></li>
+                    <li><a href=""><i class="fas fa-check-circle"></i> User Verification</a></li>
+                    <li><a href=""><i class="fas fa-bell"></i> SMS Notifications</a></li>
+                    <li><a href=""><i class="fas fa-calendar-alt"></i> Schedule</a></li>
+                    <li><a href=""><i class="fas fa-comments"></i> Feedback</a></li>
+                    <li><a href="#"><i class="fas fa-info-circle"></i> About Us</a></li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Header -->
+    <div class="header">
+        <div class="navbar-left">
+            <img src="assets/images/logo.png" alt="EcoSort Logo">
+            <div class="eco-logo">
+                <span style="color: #00ff13">E</span>
+                <span style="color: #29fc10">C</span>
+                <span style="color: #51f90d">O</span>
+                <span style="color: #7af60a">S</span>
+                <span style="color: #a3f306">O</span>
+                <span style="color: #cbf003">R</span>
+                <span style="color: #f4ed00">T</span>
+            </div>
+        </div>
+
+        <div class="admin-profile" onclick="toggleDropdown()">
+            <i class="fas fa-user"></i> Admin <i class="fas fa-angle-down"></i>
+            <div class="dropdown-menu" id="dropdownMenu">
+                <a href="welcome.html" class="logout">Logout</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+        <h2>Schedule</h2>
+        <div>
+            <button class="add-button" onclick="openModal()" style="margin-bottom: 10px;">Add Schedule</button>
+        </div>
+        <table class="schedule-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Time</th>
+                    <th>Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% schedules.forEach(schedule=> { %>
+                    <tr>
+                        <td>
+                            <%= new Date(schedule.date).toLocaleDateString('en-GB', { weekday: 'short' , month: 'short'
+                                , day: '2-digit' , year: 'numeric' }) %>
+                        </td>
+                        <td>
+                            <%= convertToAMPM(schedule.time) %>
+                                <% function convertToAMPM(timeStr) { const [hours, minutes, seconds]=timeStr.split(':');
+                                    let hour=parseInt(hours); const suffix=hour>= 12 ? 'PM' : 'AM';
+
+                                    if (hour === 0) {
+                                    hour = 12;
+                                    } else if (hour > 12) {
+                                    hour = hour - 12;
+                                    }
+
+                                    return `${hour}:${minutes} ${suffix}`;
+                                    }
+                                    %>
+                        </td>
+                        <td>
+                            <%= schedule.location %>
+                        </td>
+                        <td>
+                            <button class="edit-button" data-id="<%= schedule.id %>" data-date="<%= schedule.date %>"
+                                data-time="<%= schedule.time %>" data-location="<%= schedule.location %>">
+                                Edit
+                            </button>
+                            <a class="delete-button" href="/delete/<%= schedule.id %>">Delete</a>
+                        </td>
+                    </tr>
+                    <% }) %>
+
+            </tbody>
+
+        </table>
+    </div>
+
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add Schedule</h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <form action="/add-schedule" method="POST" style="margin-top: 20px;">
+                <label for="date">Date:</label>
+                <input type="date" id="date" name="date" required><br>
+                <label for="time">Time:</label>
+                <input type="time" id="time" name="time" required><br>
+                <label for="location">Location:</label>
+                <input type="text" id="location" name="location" required><br>
+                <button type="submit">Add Schedule</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Edit Schedule</h2>
+                <span class="modal-close" onclick="closeModal()">&times;</span>
+            </div>
+            <form method="POST" id="editForm" style="margin-top: 20px;">
+                <input type="hidden" id="editId" name="id">
+                <label for="editDate">Date:</label>
+                <input type="date" id="editDate" name="date" required><br>
+                <label for="editTime">Time:</label>
+                <input type="time" id="editTime" name="time" required><br>
+                <label for="editLocation">Location:</label>
+                <input type="text" id="editLocation" name="location" required><br>
+                <button type="submit">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const successAdd = urlParams.get('success_add');
+        const successUpdate = urlParams.get('success_update');
+        const successDelete = urlParams.get('success_delete');
+        const status = urlParams.get('status');
+
+        if (successAdd === 'true') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Schedule Added',
+                text: 'The schedule has been added successfully.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        if (successUpdate === 'true') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Schedule Updated',
+                text: 'The schedule has been updated successfully.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        if (successDelete === 'true') {
+            Swal.fire({
+                icon: 'success',
+                title: 'Schedule Deleted',
+                text: 'The schedule has been deleted successfully.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+
+        if (status === 'error') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'There was an error processing your request. Please try again.',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    </script>
+
+    <script>
+        function toggleDropdown() {
+            const dropdownMenu = document.getElementById('dropdownMenu');
+            dropdownMenu.style.display = dropdownMenu.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function toggleSubMenu() {
+            const subMenu = document.getElementById('dashboardSubMenu');
+            const caret = document.getElementById('caret');
+            if (subMenu.style.display === 'block') {
+                subMenu.style.display = 'none';
+                caret.className = 'bi bi-caret-down-fill';
+            } else {
+                subMenu.style.display = 'block';
+                caret.className = 'bi bi-caret-up';
+            }
+        }
+
+        function openModal() {
+            document.getElementById("myModal").style.display = "block";
+        }
+
+        function closeModal() {
+            const modals = document.querySelectorAll('.modal');
+            modals.forEach(modal => {
+                modal.style.display = "none";
+            });
+        }
+
+        window.onclick = function (event) {
+            if (event.target.classList.contains('modal')) {
+                closeModal();
+            }
+        }
+
+        document.querySelectorAll('.edit-button').forEach(button => {
+            button.addEventListener('click', function () {
+                const id = this.getAttribute('data-id');
+                const date = this.getAttribute('data-date');
+                const time = this.getAttribute('data-time');
+                const location = this.getAttribute('data-location');
+                const form = document.getElementById('editForm');
+                form.action = `/update/${id}`;
+
+                document.getElementById('editId').value = id;
+                document.getElementById('editDate').value = date;
+                document.getElementById('editTime').value = time;
+                document.getElementById('editLocation').value = location;
+                document.getElementById("editModal").style.display = "block";
+            });
+        });
+
+    </script>
+</body>
+
+</html>
